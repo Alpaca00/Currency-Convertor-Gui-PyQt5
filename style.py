@@ -1,3 +1,4 @@
+#! /usr/bin/python3.8
 def resultBtnStyle():
     return """
         QPushButton {

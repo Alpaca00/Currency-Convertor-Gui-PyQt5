@@ -1,18 +1,20 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
-import sys, os
+#! /usr/bin/python3.8
+import sys
 import json
 import urllib.request
 import style
 from datetime import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt
+
 
 try:
     html = urllib.request.urlopen('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
     data = html.read()
     JSON_object = json.loads(data)
-except:
-    QMessageBox.information('Warning', 'Problem with internet connection')
+except ReferenceError as err:
+    print(f'Warning! {err}')
 
 
 class Main(QWidget):
@@ -49,10 +51,12 @@ class Main(QWidget):
         self.amountLineEdit.setPlaceholderText('Enter your amount to convert')
         self.amountLineEdit.setStyleSheet(style.lineEditStyle())
         self.fromComboCurrency = QComboBox()
-        self.fromComboCurrency.addItems(['United States USD', 'Europe EURO', 'Russia RUBLE', 'Cryptocurrency BITCOIN', 'Ukraine UAH'])
+        self.fromComboCurrency.addItems(
+            ['United States USD', 'Europe EURO', 'Russia RUBLE', 'Cryptocurrency BITCOIN', 'Ukraine UAH'])
         self.fromComboCurrency.setStyleSheet(style.textStyle())
         self.toComboCurrency = QComboBox()
-        self.toComboCurrency.addItems(['Ukraine UAH', 'Cryptocurrency BITCOIN', 'Russia RUBLE', 'Europe EURO', 'United States USD'])
+        self.toComboCurrency.addItems(
+            ['Ukraine UAH', 'Cryptocurrency BITCOIN', 'Russia RUBLE', 'Europe EURO', 'United States USD'])
         self.toComboCurrency.setStyleSheet(style.textStyle())
         self.amountText = QLabel('Amount: ')
         self.amountText.setStyleSheet(style.textLabelstyle())
@@ -67,7 +71,6 @@ class Main(QWidget):
         self.resultLabel.setStyleSheet(style.resultLabelStyle())
         ########widget of bottom layout######
         self.latestCurrencyRates = QLabel()
-
 
     def layouts(self):
         self.mainLayout = QVBoxLayout()
@@ -107,35 +110,35 @@ class Main(QWidget):
     def displayCurrency(self):
         global JSON_object
         global usdBuy, usdSale, eurBuy, eurSale, rubBuy, rubSale, btcBuy, btcSale
-        self.allCurrencyDisplay.setText('Currency ' + '\t\t' + ' Buy ' + '\t\t' + ' Sale')
+        self.allCurrencyDisplay.setText('Currency ' + '\t' + ' Buy ' + '\t' + ' Sale')
         self.allCurrencyDisplay.setAlignment(Qt.AlignLeft)
         self.allCurrencyDisplay.setStyleSheet(style.displayStyle())
         usdBuy = JSON_object[0]['buy']
         buyUsd = round(float(usdBuy), 2)
         usdSale = JSON_object[0]['sale']
         saleUsd = round(float(usdSale), 2)
-        self.usdLabel.setText('USD' + '\t\t' + str(buyUsd) + '\t\t' + str(saleUsd))
+        self.usdLabel.setText('USD' + '\t\t' + str(buyUsd) + '\t' + str(saleUsd))
         self.usdLabel.setAlignment(Qt.AlignLeft)
         self.usdLabel.setStyleSheet(style.displayStyle())
         eurBuy = JSON_object[1]['buy']
         buyEur = round(float(eurBuy), 2)
         eurSale = JSON_object[1]['sale']
         saleEur = round(float(eurSale), 2)
-        self.eurLabel.setText('EUR' + '\t\t' + str(buyEur) + '\t\t' + str(saleEur))
+        self.eurLabel.setText('EUR' + '\t\t' + str(buyEur) + '\t' + str(saleEur))
         self.eurLabel.setAlignment(Qt.AlignLeft)
         self.eurLabel.setStyleSheet(style.displayStyle())
         rubBuy = JSON_object[2]['buy']
         buyRub = round(float(rubBuy), 3)
         rubSale = JSON_object[2]['sale']
         saleRub = round(float(rubSale), 3)
-        self.rubLabel.setText('RUB' + '\t\t' + str(buyRub) + '\t\t' + str(saleRub))
+        self.rubLabel.setText('RUB' + '\t\t' + str(buyRub) + '\t' + str(saleRub))
         self.rubLabel.setAlignment(Qt.AlignLeft)
         self.rubLabel.setStyleSheet(style.displayStyle())
         btcBuy = JSON_object[3]['buy']
         buyBtc = round(float(btcBuy), 2)
         btcSale = JSON_object[3]['sale']
         saleBtc = round(float(btcSale), 2)
-        self.btcLabel.setText('BTC' + '\t\t' + str(buyBtc) + '\t\t' + str(saleBtc))
+        self.btcLabel.setText('BTC' + '\t\t' + str(buyBtc) + ' ' + str(saleBtc))
         self.btcLabel.setAlignment(Qt.AlignLeft)
         self.btcLabel.setStyleSheet(style.displayStyle())
 
@@ -149,29 +152,29 @@ class Main(QWidget):
             if (valueFrom == 'United States USD') and (valueTo == 'Ukraine UAH'):
                 calculation = float(usdBuy) * float(amount)
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' USD' + '\t' + str(calculation) + ' UAH' )
+                self.resultLabel.setText(str(amount) + ' USD' + '\t' + str(calculation) + ' UAH')
             elif (valueFrom == 'Europe EURO') and (valueTo == 'Ukraine UAH'):
                 calculation = float(eurBuy) * float(amount)
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' EURO' + '\t' + str(calculation) + ' UAH' )
+                self.resultLabel.setText(str(amount) + ' EURO' + '\t' + str(calculation) + ' UAH')
             elif (valueFrom == 'Russia RUBLE') and (valueTo == 'Ukraine UAH'):
                 calculation = float(rubBuy) * float(amount)
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' RUB' + '\t' + str(calculation) + ' UAH' )
+                self.resultLabel.setText(str(amount) + ' RUB' + '\t' + str(calculation) + ' UAH')
             elif (valueFrom == 'Cryptocurrency BITCOIN') and (valueTo == 'Ukraine UAH'):
                 calculation = float(btcBuy) * (float(amount) * float(usdBuy))
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' BTC' + '\t' + str(calculation) + ' UAH' )
+                self.resultLabel.setText(str(amount) + ' BTC' + '\t' + str(calculation) + ' UAH')
             elif (valueFrom == 'Ukraine UAH') and (valueTo == 'Ukraine UAH'):
-                self.resultLabel.setText(str(amount) + ' UAH' )
+                self.resultLabel.setText(str(amount) + ' UAH')
             elif (valueFrom == 'United States USD') and (valueTo == 'United States USD'):
-                self.resultLabel.setText(str(amount) + ' USD' )
+                self.resultLabel.setText(str(amount) + ' USD')
             elif (valueFrom == 'Europe EURO') and (valueTo == 'Europe EURO'):
-                self.resultLabel.setText(str(amount) + ' EURO' )
+                self.resultLabel.setText(str(amount) + ' EURO')
             elif (valueFrom == 'Russia RUBLE') and (valueTo == 'Russia RUBLE'):
-                self.resultLabel.setText(str(amount) + ' RUB' )
+                self.resultLabel.setText(str(amount) + ' RUB')
             elif (valueFrom == 'Cryptocurrency BITCOIN') and (valueTo == 'Cryptocurrency BITCOIN'):
-                self.resultLabel.setText(str(amount) + ' BTC' )
+                self.resultLabel.setText(str(amount) + ' BTC')
             elif (valueFrom == 'Ukraine UAH') and (valueTo == 'United States USD'):
                 calculation = float(amount) / float(usdSale)
                 calculation = round(calculation, 2)
@@ -213,13 +216,13 @@ class Main(QWidget):
                 calculation = float(fromEurToUsd) / float(btcSale)
                 self.resultLabel.setText(str(amount) + ' EURO' + '\t' + str(calculation) + ' BTC')
             elif (valueFrom == 'Russia RUBLE') and (valueTo == 'United States USD'):
-                calculation = float(rubBuy) * float(amount) /float(usdSale)
+                calculation = float(rubBuy) * float(amount) / float(usdSale)
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' RUB' + '\t' + str(calculation) + ' USD' )
+                self.resultLabel.setText(str(amount) + ' RUB' + '\t' + str(calculation) + ' USD')
             elif (valueFrom == 'Russia RUBLE') and (valueTo == 'Europe EURO'):
-                calculation = float(rubBuy) * float(amount) /float(usdSale)
+                calculation = float(rubBuy) * float(amount) / float(usdSale)
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' RUB' + '\t' + str(calculation) + ' EURO' )
+                self.resultLabel.setText(str(amount) + ' RUB' + '\t' + str(calculation) + ' EURO')
             elif (valueFrom == 'Russia RUBLE') and (valueTo == 'Cryptocurrency BITCOIN'):
                 fromEurToUsd = (float(rubBuy) * float(amount) / float(usdSale))
                 calculation = float(fromEurToUsd) / float(btcSale)
@@ -227,7 +230,7 @@ class Main(QWidget):
             elif (valueFrom == 'Cryptocurrency BITCOIN') and (valueTo == 'United States USD'):
                 calculation = float(btcBuy) * float(amount)
                 calculation = round(calculation, 2)
-                self.resultLabel.setText(str(amount) + ' BTC' + '\t' + str(calculation) + ' USD' )
+                self.resultLabel.setText(str(amount) + ' BTC' + '\t' + str(calculation) + ' USD')
             elif (valueFrom == 'Cryptocurrency BITCOIN') and (valueTo == 'Europe EURO'):
                 calculation = float(btcBuy) * float(amount)
                 calculation = calculation / (float(eurBuy) * float(amount) / float(usdSale))
@@ -250,10 +253,10 @@ class Main(QWidget):
 
 
 def main():
-    APP= QApplication(sys.argv)
+    APP = QApplication(sys.argv)
     window = Main()
     sys.exit(APP.exec_())
 
+
 if __name__ == '__main__':
     main()
-
